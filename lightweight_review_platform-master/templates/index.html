@@ -1,0 +1,81 @@
+
+{% extends '__base__.html' %}
+
+{% block title %}首页{% endblock %}
+
+{% block content %}
+
+<div class="index">
+	<div class="first-block">
+		<div class="text-banner">
+			<div class="text-container">	
+					<h1>考研宝</h1>
+					<br/>
+					<h5>基于数据挖掘的轻量化考研复习平台</h5>
+			</div>
+			
+		</div>
+		<div class="img-container">
+			<img src="/static/img/MG.png">
+			
+		</div>
+	</div>
+
+	<div class="solution-list second-block">
+		<div class="text-container">	
+			<h1>三大模块 助力考研</h1>
+			<br/>
+			<h1>Three Main Modules</h1>
+		</div>
+		<div class="divider-line"></div>
+		<ul id="solutionList" class="clearfix">
+			<li>
+				<div class="solution-item-wrapper solution-item-01">
+					<p class="solution-title">错题回顾</p>
+					<div class="short-bar"></div>
+					<p class="solution-intro">在这里，你可以在线记录错题，回顾错题，分享错题。把错题看做是一种资源是对经验的总结升华。</p>
+					<a onclick="gotoQuestionList()" style="cursor: pointer;">查看详情</a>
+				</div>
+			</li>
+		
+			<li  class="active">
+				<div class="solution-item-wrapper solution-item-03">
+					<p class="solution-title">智能组题</p>
+					<div class="short-bar"></div>
+					<p class="solution-intro">在这里，你可以获得通过分析你的错题记录进而为你智能地推荐的题目，针对你的薄弱点进行有针对性的练习。</p>
+					<a onclick="gotoRecommendQuestion()" style="cursor: pointer;">查看详情</a>
+				</div>
+			</li>
+			<li>
+				<div class="solution-item-wrapper solution-item-04">
+					<p class="solution-title">资讯广场</p>
+					<div class="short-bar"></div>
+					<p class="solution-intro">在这里，你可以第一时间了解到考研资讯，从此拒绝错过关键时间点，为考研保驾护航、助力远航。</p>
+					<a href="{% url 'main_platform:hot_spot' %}">查看详情</a>
+				</div>
+			</li>
+		</ul>
+		<div class="divider-line"></div>
+	</div>
+	<footer>
+		<p>Powered by 计设考研宝项目组. Copyright © 2018. All rights reserved.</p>
+	</footer>
+</div>
+
+{% endblock %}
+			
+
+{% block content_js %}
+	<script type="text/javascript">
+	$(document).ready(function(){
+		
+		var b = $("#solutionList li");
+		b.mouseover(function() {
+			var e = $(this);
+			b.removeClass("active");
+			e.addClass("active")
+		});
+
+	});
+	</script>
+{% endblock %}

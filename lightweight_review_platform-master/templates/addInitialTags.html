@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>完善信息 - 考 研 宝</title>
+
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/logo.ico" media="screen">
+    <link rel="stylesheet" href="/static/css/mystyle.css" type="text/css"  media="all">
+
+</head>
+<body>
+    <div class="activateSuccess" onselectstart="return false;">
+        <div class="initialTags-header"> 
+            <h4>选择或添加您的薄弱标签</h4>
+            <div class="divider-line"></div>
+        </div>
+        <div class="panel-area">
+            <ul>
+                {% for course in courseList %}
+                <li class="panel course-{{ course.id }}">
+                    <h5>{{ course.name }}</h5>
+                    <div class="divider-line"></div>
+                    <div class="tags-select-area">
+                        <ul>
+                            {% for initialTag in course.commonweaknesstag_set.all %}
+                            <li class="tag">{{ initialTag }}</li>   
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="divider-line"></div>
+                    <h5>添加你自己的标签</h5>
+                    <div class="tags-add-area">
+                        <div class="tag-added">
+                        </div>
+                        <div class="btn-addTags" title="添加标签">
+                            <i class="glyphicon glyphicon-plus"></i>
+                        </div>
+                        <div class="tag-inputBox">
+                            <input class="input-tag" id="input-tag-{{ course.id }}" type="text" placeholder="请输入标签">
+                            <i class="glyphicon glyphicon-ok save-tag" id="save-tag-{{ course.id }}" title="保存"></i>
+                        </div>
+                    </div>
+                    <input class="hidden-tags" id="hidden-tags-{{ course.id }}" type="text" name="initialTags-{{ course.id }}" hidden>
+                </li>
+                {% endfor %}
+            </ul> 
+        </div>
+        <div class="initialTags-footer"> 
+            <button class="btn btn-primary" id="submitInitialTags">保存并完成注册</button>
+        </div>
+        
+    </div>
+
+
+
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/sweetalert.js"></script>
+
+    <script type="text/javascript">
+
+        $(".tags-select-area .tag").click(function(){   //选择标签时
+            var courseID = $(this).closest('.panel').attr("class").split(' ')[1].split('-')[1];
+            if($(this).hasClass('selected')){
+                $(this).removeClass('selected');
+                $('#hidden-tags-' + courseID).val($('#hidden-tags-' + courseID).val().replace("_"+$(this).text(),""));
+            }
+            else{
+                var reStr = '(_'+$(this).text()+'$|_'+$(this).text()+'_)';
+                var reg = new RegExp(reStr);
+                if($('#hidden-tags-' + courseID).val().match(reg)) {
+                    swal ({
+                        icon: "error",
+                        text: "已经输入此标签",
+                    });
+                }
+                else{
+                    $(this).addClass('selected');
+                    $('#hidden-tags-' + courseID).val($('#hidden-tags-' + courseID).val() + '_' + $(this).text());
+                }
+            }
+        });
+
+        $("#submitInitialTags").click(function(){
+            var initialTagsArray = []; //ajax传的数组，其内元素为courseTags对象
+            var $course = $('.hidden-tags');
+            for (var i = 0; i < $course.length; i++) {
+                courseTags = {};//对象，有两个属性，course_id和initialTags
+                courseTags['course_id'] = $course[i].id.split('-')[2];
+                courseTags['initialTags'] = $course[i].value;//该科目的初始标签，格式与问题页面的相同
+                initialTagsArray[i] = courseTags;
+            }
+            
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url:"/initialTags_again/",//这里路径根据后端修改
+                data: {
+                  userInitialTags : initialTagsArray,
+                  length: $course.length
+                }, 
+                dateType:"json",
+                async: true,
+                success: function(data) {
+                    if(data.status == 'success'){
+                        swal ({
+                            icon: "success",
+                            text: "保存成功！",
+                            showCancelButton: true,
+                            confirmButtonText: '回到首页',
+                            cancelButtonText: '取消',
+                        }).then(function(isConfirm) {
+                            if(isConfirm === true){
+                                window.location.href = "{% url 'main_platform:recommend_question' %}";
+                            }
+                        });
+                    }else if(data.status == 'fail'){
+                        swal ({
+                            icon: "error",
+                            text: "保存失败，请重试",
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        var originWidth = 0;//测试用
+
+        function renderTagsBtn(){
+            $(".tags-add-area .tag").mouseenter(function(){
+                originWidth = $(this).width();
+                $(this).css("border","1px solid #3d79e5");
+                $(this).stop(true, false).animate({"width":$(this).width()+30});
+                $(this).children(".tag-btn-area").fadeIn();
+            });
+
+            $(".tags-add-area .tag").mouseleave(function(){
+                $(this).css("border","1px solid #bebebe");
+                $(this).children(".tag-btn-area").fadeOut(150);
+                $(this).stop(true, false).animate({"width":originWidth+22});
+            });
+
+            $(".tags-add-area .tag-btn-remove").click(function(){
+                var courseID = $(this).closest('.panel').attr("class").split(' ')[1].split('-')[1];
+                $(this).parent().parent().remove();
+                $('#hidden-tags-' + courseID).val($('#hidden-tags-' + courseID).val().replace("_"+$(this).parent().parent().children("a").text(),""));
+            });
+        }
+
+        function renderTagsAnimeBtns(){
+            $(".btn-addTags i").click(function(){//点击添加标签时
+                var courseID = $(this).closest('.panel').attr("class").split(' ')[1].split('-')[1];
+                $(this).parent(".btn-addTags").hide();
+                $('#input-tag-'+courseID).show().animate({"width":"150px","opacity":"100"});
+                $('#save-tag-'+courseID).fadeIn(100);
+                $('#input-tag-'+courseID).focus();
+            });
+
+            renderTagsBtn();
+
+            $(".input-tag").blur(function(){//输入框失去焦点时取消添加标签
+                var courseID = $(this).closest('.panel').attr("class").split(' ')[1].split('-')[1];
+                $('#save-tag-'+courseID).fadeOut(100,function(){
+                    $('#input-tag-'+courseID).animate({"width":"23px","opacity":"0"},function(){
+                        $('#input-tag-'+courseID).hide();
+                        $('.course-'+courseID+' .btn-addTags').show();
+                    });
+                });
+            });
+
+            $(".save-tag").click(function(){//点击保存标签时
+                var courseID = $(this).closest('.panel').attr("class").split(' ')[1].split('-')[1];
+                if($('#input-tag-'+courseID).val()){
+                    var reStr = '(_'+$('#input-tag-'+courseID).val()+'$|_'+$('#input-tag-'+courseID).val()+'_)';
+                    var reg = new RegExp(reStr);
+                    if($('#hidden-tags-'+courseID).val().match(reg)) {
+                        swal ({
+                            icon: "error",
+                            text: "已经输入此标签",
+                        });
+                    }
+                    else{
+                        $('#hidden-tags-'+courseID).val($('#hidden-tags-'+courseID).val() + '_' + $('#input-tag-'+courseID).val());
+                        $('#save-tag-'+courseID).fadeOut(100,function(){
+                            $('.course-'+courseID+' .tag-added').append('<li class="tag"><a href="##">'
+                                + $('#input-tag-'+courseID).val() 
+                                +'</a><div class="tag-btn-area"><i class="glyphicon glyphicon-remove tag-btn tag-btn-remove" title="删除"></i></div></li>');
+                            $('#input-tag-'+courseID).animate({"width":"23px","opacity":"0"},function(){
+                                $('#input-tag-'+courseID).hide();
+                                $('.course-'+courseID+' .btn-addTags').show();
+                                $('#input-tag-'+courseID).val("");
+                            });
+                            renderTagsBtn();
+                        });
+                    }
+                    
+                }
+            });
+
+            $(".input-tag").keyup(function(event){//回车保存标签
+                if(event.keyCode ==13){
+                    var courseID = $(this).closest('.panel').attr("class").split(' ')[1].split('-')[1];
+                    if($('#input-tag-'+courseID).val()){
+                        var reStr = '(_'+$('#input-tag-'+courseID).val()+'$|_'+$('#input-tag-'+courseID).val()+'_)';
+                        var reg = new RegExp(reStr);
+                        if($('#hidden-tags-'+courseID).val().match(reg)) {
+                            swal ({
+                                icon: "error",
+                                text: "已经输入此标签",
+                            });
+                        }
+                        else{
+                            $('#hidden-tags-'+courseID).val($('#hidden-tags-'+courseID).val() + '_' + $('#input-tag-'+courseID).val());
+                            $('#save-tag-'+courseID).fadeOut(100,function(){
+                                $('.course-'+courseID+' .tag-added').append('<li class="tag"><a href="##">'
+                                + $('#input-tag-'+courseID).val() 
+                                +'</a><div class="tag-btn-area"><i class="glyphicon glyphicon-remove tag-btn tag-btn-remove" title="删除"></i></div></li>');
+                                $('#input-tag-'+courseID).animate({"width":"23px","opacity":"0"},function(){
+                                    $('#input-tag-'+courseID).hide();
+                                    $('.course-'+courseID+' .btn-addTags').show();
+                                    $('#input-tag-'+courseID).val("");
+                                });
+                                renderTagsBtn();
+                            });
+                        }
+                    }
+                }
+            });
+        }
+
+        renderTagsAnimeBtns();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	{% block meta %}<!-- block meta  -->{% endblock %}
+
+	<title>{% block title %}<!-- block title  -->{% endblock %} - 考 研 宝</title>
+
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/jquery.mCustomScrollbar.min.css' %}" />
+	<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+	<link rel="stylesheet" href="{% static 'css/buttonStyle.css' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static '/img/logo.ico' %}" media="screen">
+	<link rel="stylesheet" href="{% static 'css/mystyle.css' %}" type="text/css"  media="all">
+	<script type="text/javascript">
+		function gotoQuestionList(){
+			{% if request.user.is_authenticated %}
+				window.location.href = "{% url 'main_platform:question_list' %}";
+			{% else %}
+				$("#myModal").modal("toggle");
+			{% endif %}
+		}
+
+		function gotoRecommendQuestion(){
+			{% if request.user.is_authenticated %}
+				window.location.href = "{% url 'main_platform:recommend_question' %}";
+			{% else %}
+				$("#myModal").modal("toggle");
+			{% endif %}
+		}
+	</script>
+
+
+	{% block beforehead %}<!-- before head  -->{% endblock %}
+
+</head>
+<body style="background:url(../static/img/bg_1.png) repeat top left scroll">
+
+	<div class="topbar">
+	    <div class="wraper">
+	        <div class="logo">
+	    		<a href="/" ><img src="/static/img/FullLOGO.png"></a>
+	    	</div>
+	        <div class="nav">
+	            <ul class="parent">
+	                <li><a href="{% url 'main_platform:index' %}">首页</a><span class="lines"></span></li><!--跳转到首页-->
+	                <li><a onclick="gotoQuestionList()" style="cursor: pointer;">错题回顾</a><span class="lines"></span></li><!--跳转到错题整理页面-->
+	                <li><a href="{% url 'main_platform:hot_spot' %}">资讯广场</a><span class="lines"></span></li><!--跳转到资讯页面-->
+	                <li><a onclick="gotoRecommendQuestion()" style="cursor: pointer;">智能组题</a><span class="lines"></span></li><!--跳转到组卷页面-->
+
+	                {% if request.user.is_authenticated %}
+                        <li>
+                        <a href="{% url 'usercenter' %}" title="个人中心"><i class="glyphicon glyphicon-user"></i>{{ request.user.username }}<span class="lines"></span></a>
+                        <!--跳转到个人信息页面-->
+                        </li>
+	                    <li><a href="{% url 'logout' %}"><i class="glyphicon glyphicon-off" style="padding-right: 7px;top: 1.5px;"></i>注销</a></li><!--登出用户-->
+                	{% else %}
+             		    <li><a data-toggle="modal" data-target="#myModal" style="cursor: pointer;"><i class="glyphicon glyphicon-log-in" style="padding-right: 7px;top: 1.5px;"></i>登陆</a><span class="lines"></span></li><!--跳转到登录页面-->
+                        <li><a href="{% url 'register' %}"><i class="glyphicon glyphicon-registration-mark" style="padding-right: 5px;top: 2px;"></i>注册</a><span class="lines"></span></li><!--跳转到注册页面-->
+	               	{% endif %}
+	            </ul>
+	        </div>
+	    </div>
+	</div>
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  		<div class="modal-dialog" role="document">
+
+			<div class="login_box">
+			  	<div class="login" id="login">
+			      	<div class="login_logo"><img src="/static/img/login_logo.png" /></div>
+			      	<div class="login_name">
+			           	<p>登录</p>
+			      	</div>
+			      	<div class="login-warning-box">
+			      		<p class="login-warning" v-text="login_error"></p><!-- 提示错误信息，如密码错误 -->
+			      		<a href="/activateEmail/" id="goToActivatePage" style="display: none;">点击此处前往邮箱激活页面</a>
+			      	</div>
+			      	<form action="/login/" method="post" id="login-form">
+			          	<input name="username" type="text" id="username" placeholder="用户名或邮箱">
+			          	<input name="password" type="password" id="password" placeholder="密码">
+			          	<a href="{% url 'register' %}" style="color: #03a9f4;">立即注册</a>
+			          	<input value="登录" v-on:click="login" style="width:100%;margin-top: 15px;" type="button">
+			      	</form>
+			  	</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="page-wrapper">
+		{% if request.user.is_authenticated %}
+	    <nav id="sidebar" class="sidebar-wrapper" style="box-shadow: 2px 0px 8px 0 rgba(0, 0, 0, 0.225);">
+	      <div class="sidebar-content">
+			<div style="height: 100% ;position: fixed;">
+		        <button id="toggle-sidebar" style="background: transparent;border: none;outline: none;padding: 0 0 0 0 ;"><i class="glyphicon glyphicon-menu-hamburger" style="font-size: 20px;"></i></button>
+		        <div class="sidebar-brand">  
+	            </div>
+	            <div class="split-line"></div>
+	            <div class="sidebar-header">
+	                <div class="user-pic" style="height: 60px;">
+	                    <img class="img-responsive img-rounded" src="{% static request.user.avatar %}" alt="">
+	                </div>
+	                <div class="user-info" style="width: 120px;">
+	                    <p class="general-title" style="font-size: 16px; border-bottom: 1px solid #e7e7e7;padding-bottom: 8px;height: 31px;">{{ request.user.nickname }}</p>
+		                <div class="sidebar-iconrow" style="margin-bottom: 1px;">
+		                    <a href="#" title="消息"><i class="glyphicon glyphicon-envelope"></i><!-- <span class="label label-success notification">7</span> --></a>
+		                    <a href="{% url 'usercenter' %}" title="个人中心"><i class="glyphicon glyphicon-user"></i></a>
+		                    <a href="{% url 'logout' %}" title="注销"><i class="glyphicon glyphicon-off"></i></a>
+		                </div>
+	                </div>
+	            </div>
+				<div class="split-line"></div>
+	            <div class="sidebar-header sidebar-middle" id="checkin-area">
+	            	<div style="text-align: center;padding-left: 10px;" class="sidebar-iconrow">
+			            <p class="general-title" v-text="'打卡天数：'+ checkinDays"></p>
+			            <a href="##" title="打卡"><i class="glyphicon glyphicon-ok" v-on:click="clickCheckin"></i></a>         
+	    			</div>
+	    			
+	    			
+	            </div>
+		        <div class="sidebar-menu">
+		        	<div style="position: relative;padding: 0 20px;">
+			        	<p class="general-title" style="position: absolute;bottom: 155px;padding-left: 10px;">距离考研还有：</p>  
+			        	<div class="pane-when" id="s-when">
+						  	<div class="content"> 
+							    <div class="clock clock-countdown">
+							      	<div class="site-config"  data-date-timezone="+8"></div>
+								      	<div class="elem-center">
+									        <div class="digit"> 
+									          	<span class="days" v-text="daysLeft"></span> <span class="txt">天</span> 
+									        </div>
+								      	</div>
+								      <div class="elem-bottom">
+								        <div class="deco"></div>
+							          	<span class="hours" v-text="year" style="padding-right: 4px;"></span><span class="thin">年</span> 
+							          	<span class="minutes" v-text="month" style="padding-right: 4px;"></span><span class="thin">月</span> 
+							          	<span class="seconds" v-text="day" style="padding-right: 4px;"></span><span class="thin">日</span> 
+								    </div>
+						      	</div>
+						  	</div>
+						</div> 
+					</div>
+		        	<div class="split-line"></div>
+		            <ul id="memo">
+		                <li class="header-menu general-title" style="text-align: center;padding-top: 10px;">
+		                	<p>备忘录</p>
+		                </li><!--备忘录上传还未实现-->
+		                <li style="text-align: center;">
+		                	<textarea class="sidebar-memoholder" v-text="newMemo" v-on:blur="saveMemo"></textarea>
+		                </li>
+		            </ul>
+		            </div> 
+	            </div>         
+	        </div>                                
+	    </nav>
+
+
+	    {% endif %}
+
+	    <div id="fade" class="black_overlay"></div>
+
+	   	<main class="page-content">
+            <div class="container-fluid">
+	   	{% block content %}
+
+        {% endblock %}	
+	   		</div>
+	   	</main>
+        
+		    
+
+	</div>
+ 
+
+
+	<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/vue.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert.js' %}"></script>
+  	
+
+    <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+	<script src="{% static 'js/custom.js' %}"></script>
+
+	<script type="text/javascript">
+		function IsPC() {
+	        var userAgentInfo = navigator.userAgent;
+	        var Agents = ["Android", "iPhone","SymbianOS", "Windows Phone", "iPod", "Safari"];
+	        var flag = true;
+	        for (var v = 0; v < Agents.length; v++) {
+	            if (userAgentInfo.indexOf(Agents[v]) > 0) {
+	                flag = false;
+	                break;
+	            }
+	        }
+	        if(window.screen.width>=768){
+	             flag = true;
+	        }
+	        return flag;
+	    }
+	    $(window).resize(function(){
+		   	if(IsPC()){
+		   		if (window.innerWidth < 800) {
+		   			$(".topbar .logo").css("display","none");
+		   			if(window.innerWidth < 630){
+		   				$(".topbar ul.parent li").css("padding","0 15px");
+		   				if(window.innerWidth < 450){
+		   					$(".topbar ul.parent li").css("padding","0 8px");
+		   				}
+		   			}
+		   		}
+		   		else{
+		   			$(".topbar .logo").css("display","initial");
+		   			$(".topbar ul.parent li").css("padding","0 20px");
+		   		}
+
+		   	}
+		});
+	    
+	</script>
+
+	<script type="text/javascript">
+		{% if request.user.is_authenticated %}
+		//打卡功能
+		var vm_checkin = new Vue({
+			el:'#checkin-area',
+			data:{
+				checkinDays:{{ request.user.checkin_days }},
+				lastCheckinDate:"{{ request.user.lastCheckinDate }}"
+			},
+			methods:{
+				clickCheckin: function(){
+					var now = new Date();
+					var today = now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
+					$.ajax({
+			                cache: false,
+			                type: "POST",
+			                url:"/checkin/",
+			                data: {
+			                	checkinDate: today
+			                },
+			                dateType:"json",
+			                async: true,
+			                success: function(data) {
+			                    if(data.status == 'success'){
+			                        swal ({
+									 	icon: "success",
+									 	text: data.msg,
+								 	});
+								 	vm_checkin.checkinDays ++;
+			                    }else if(data.status == 'fail'){
+			                       	swal ({
+									 	icon: "error",
+									 	text: data.msg,
+								 	});
+			                    }
+			                }
+			        });
+					
+				}
+			}
+		});
+
+		//备忘录功能
+		var vm_memo = new Vue({
+			el:'#memo',
+			data:{
+				memo:"{{ request.user.memo|linebreaksbr }}"
+			},
+			computed:{
+				newMemo:function(){
+					return this.memo.replace(/<br \/>/g, '\n');
+				}
+			},
+			methods:{
+				saveMemo: function(){					
+					$.ajax({
+			                cache: false,
+			                type: "POST",
+			                url:"/memo/",
+			                data: {
+			                	memoContent: $(".sidebar-memoholder").val()
+			                },
+			                dateType:"json",
+			                async: true,
+			                success: function(data) {
+			                    if(data.status == 'success'){
+			                        return;
+			                    }else if(data.status == 'fail'){
+			                        swal ({
+									 	icon: "error",
+									 	text: '备忘录保存失败，请重试',
+									 	type:'error',
+								 	});
+			                    }
+			                }
+			        });
+				}
+			}
+		});
+
+		{% endif %}
+	</script>
+
+    
+	<script type="text/javascript">
+		var vm_login = new Vue({
+	        el: '#login',
+	        data: {
+	        	login_error:''
+	        },
+	        methods: {
+	            login: function() {
+			        if($(".login #username").val() === "" && $(".login #password").val() === ""){
+			        	this.login_error = "请输入用户名和密码";
+					}
+					else if($(".login #username").val() === ""){
+						this.login_error = "请输入用户名";
+					}
+					else if($(".login #password").val() === ""){
+						this.login_error = "请输入密码";
+					}
+					else{
+						
+		            	$.ajax({
+			                cache: false,
+			                type: "POST",
+			                url:"/login/",
+			                data:$('#login-form').serialize(),
+			                dateType:"json",
+			                async: true,
+			                success: function(data) {
+			                    if(data.status == 'success'){
+			                        window.location.href = data.url;//跳转到首页
+			                    }else if(data.status == 'fail'){
+			                        vm_login.login_error = data.msg;
+			                        if(data.msg === "用户未激活, 请先激活用户"){
+			                        	$("#goToActivatePage").css("display","inline-block");
+			                        }
+			                        //根据后端返回信息显示登录错误
+			                    }
+			                }
+			            });
+					}
+	            }
+	        }
+    	});
+	</script>
+	<script type="text/javascript">
+		var end = new Date('2018/12/23 00:00:00');//可以改成从后端传入考研时间
+		var now = new Date();
+		var vm_countdown = new Vue({
+	        el: '#s-when',
+	        data:{
+	        	daysLeft:'0',
+	        	year:'0',
+	        	month:'0',
+	        	day:'0',
+	        }
+	    });
+		setInterval(function(){
+			now = new Date();
+			vm_countdown.daysLeft = Math.floor((end.getTime()-now.getTime())/(24*60*60*1000));
+			vm_countdown.year = now.getFullYear();
+			vm_countdown.month = now.getMonth()+1;
+			vm_countdown.day = now.getDate();
+		}, 1000);
+	</script>
+
+   	{% block content_js %}
+
+    {% endblock %}
+
+</body>
+</html>

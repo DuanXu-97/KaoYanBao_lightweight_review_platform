@@ -1,0 +1,269 @@
+
+{% extends '__base__.html' %}
+
+{% block title %}资讯广场{% endblock %}
+
+{% block content %}
+
+<main>
+<div class="container-fluid">
+
+    			<div class="row hotspot">
+                    <div class="col-md-5 col-sm-12" id="inbox-wrapper">
+
+                        <section class="panel search-test-inner" id="hotspot-list">
+                            <header class="panel-heading">
+                                <h4>资讯广场
+                        			<form action="#" class="pull-right">
+			                            <div class="input-append">
+			                                <input type="text" class="form-control search-value" placeholder="搜索热点">
+			                            </div>
+			                        </form>
+		                       	</h4>
+                            </header>
+
+                            <div class="panel-body">
+                                <div class="table-responsive pull-left">
+                                    <table class="table table-inbox table-hover">
+                                        <tbody class="search-value-list">
+
+                                        	{% for hotspotItem in hotspot_list %}
+
+                                        	<tr class="list-item" id='ListItem_{{ hotspotItem.id }}' date-page="1" v-on:click="clickListItem({{ hotspotItem.id }})">
+                                                <td><i class="glyphicon glyphicon-star"></i>
+                                                </td>
+                                                <td class="list-item-content">
+                                                	<a href="#">
+	                                                	<span class="title search-tit">{{ hotspotItem.title }}</span>
+	                                                	<p>
+	                                                	</p>
+                                           			</a>
+                                                </td>
+                                                <td class="text-right">{{ hotspotItem.date }}</td>
+                                            </tr>
+
+                                        	{% endfor %}
+
+                                      </tbody>
+                                    </table>
+
+                                </div>
+
+                                <div class="hotspot-option">
+                                    
+                                    <ul class="hotspot-pag pull-right">
+                                        <li><span v-text = "presentPage+' of '+AmountPages"></span>
+                                        </li>
+                                        <li>
+                                            <a class="btn btn-default btn-sm" v-on:click="clickPageLeft" href="#"><i class="glyphicon glyphicon-chevron-left  pag-left"></i></a>
+                                        </li>
+                                        <li>
+                                            <a class="btn btn-default btn-sm" v-on:click="clickPageRight" href="#"><i class="glyphicon glyphicon-chevron-right pag-right"></i></a>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+                    <div class="col-md-7 col-sm-12" id="view-hotspot-wrapper">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <header>
+                                    <h2>资讯详情</h2>
+                                    <div id="list-item-date-box" class="hotspot-item-box">
+
+                                    	{% for hotspotItem in hotspot_list %}
+                                    	<p class="pull-right hotspot-item-{{ hotspotItem.id }}" >{{ hotspotItem.date }}</p>
+                                    	{% endfor %}
+
+                                    </div>
+                                </header>
+                                <div class="row view-hotspot-header">
+                                    <div class="col-md-8 info-sourse hotspot-item-box" id="list-item-title-box" style="padding-left: 30px;display: inline-block;">
+
+                                        {% for hotspotItem in hotspot_list %}
+                                        <h4 class="hotspot-item-{{ hotspotItem.id }}">{{ hotspotItem.title }}</h4>
+                                        {% endfor %}
+
+                                    </div>
+                                    <!-- <div class="col-md-4"  style="margin-top: 5px; display: inline-block;float: right;">
+                                        <div class="pull-right">
+                                            <button class="btn btn-sm btn-primary" id="collectionBtn" v-on:click="clickCollection" style="outline: none;">收藏</button>
+                                        </div>
+                                    </div> -->
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+
+                                        <div class="panel view-hotspot-body hotspot-item-box" id="list-item-content-box">
+
+                                        	{% for hotspotItem in hotspot_list %}
+                                            <div class="panel-body hotspot-item-{{ hotspotItem.id }}">
+                                                <p>{{ hotspotItem.content }}</p>
+                                            </div>
+                                            {% endfor %}
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+</div>
+</main>
+
+{% endblock %}
+			
+
+{% block content_js %}
+	
+	<script type="text/javascript">		
+
+			var vm_hotspotlist = new Vue({
+				el: '#hotspot-list',
+				data: {
+					maxLen: 30,//列表梗概字数
+					AmountofItem: 0,//总共爬取的新闻数
+					AmountifItemPrepage: 5,//列表每页的条目数
+					presentPage: 1
+	        	},
+	        	computed:{
+	        		AmountPages:function(){
+	        			return Math.ceil(this.AmountofItem/this.AmountifItemPrepage);
+	        		}
+	        	},
+	        	methods:{
+	        		initial:function(){
+
+						{% for hotspotItem in hotspot_list %}
+
+						this.AmountofItem++;
+
+						$("#ListItem_{{ hotspotItem.id }}").attr("date-page",Math.ceil(this.AmountofItem/this.AmountifItemPrepage).toString());
+						
+
+						{% endfor %}
+
+	        			$('.search-value-list > [date-page!='+this.presentPage+']').hide();
+						$(".hotspot-item-box").children().hide();
+						$(".hotspot-item-1").show();
+						$(".list-item").removeClass("active");
+						$("#ListItem_1").addClass("active");
+
+	        		},
+
+	        		clickListItem:function(id){
+	        			$('.hotspot-item-box').children().not('.hotspot-item-'+id+'').hide();
+						$('.hotspot-item-box .hotspot-item-'+id+'').fadeIn();
+						if($('#ListItem_'+id+'').hasClass('collected')){//用户已经收藏该新闻
+							$("collectionBtn").text('取消收藏');
+						}
+						else{
+							$("collectionBtn").text('收藏');
+						}
+						$(".list-item").not('#ListItem_'+id+'').removeClass("active");
+						$('#ListItem_'+id+'').addClass("active");
+	        		},
+
+	        		clickCollection:function(){
+	        			if($('.active').hasClass('collected'))//用户已经收藏该新闻
+	        			{
+	        				// $("collectionBtn").text('收藏');
+	        				// $('.active i').css("color","#cccccc");
+	        				// $('.active').removeClass("collected");
+	        				$.ajax({
+				                cache: false,
+				                type: "POST",
+				                url:"/hotspot/removeCollected/",
+				                data:{
+				                	//id是取消收藏的新闻id
+				                	id : $('.active').attr('id').split('_')[1]
+				                },
+				                dateType:"json",
+				                async: true,
+				                success: function(data) {
+				                    if(data.status == 'success'){
+				                        $("collectionBtn").text('收藏');
+				        				$('.active i').css("color","#cccccc");
+				        				$('.active').removeClass("collected");
+				                    }else if(data.status == 'fail'){
+				                        swal ({
+										 	icon: "error",
+										 	text: "取消收藏失败，请重试",
+										 	type:"error"
+								 		});
+				                    }
+				                },
+				            });
+	        			}
+	        			else{
+	        				// $("collectionBtn").text('取消收藏');
+	        				// $('.active i').css("color","#edce8c");
+	        				// $('.active').addClass("collected");
+	        				$.ajax({
+				                cache: false,
+				                type: "POST",
+				                url:"/hotspot/addCollected/",
+				                data:{
+				                	//id是要收藏的新闻id
+				                	id : $('.active').attr('id').split('_')[1]
+				                },
+				                dateType:"json",
+				                async: true,
+				                success: function(data) {
+				                    if(data.status == 'success'){
+				                        $("collectionBtn").text('取消收藏');
+				        				$('.active i').css("color","#edce8c");
+				        				$('.active').addClass("collected");
+				                    }else if(data.status == 'fail'){
+				                        swal ({
+										 	icon: "error",
+										 	text: "取消收藏失败，请重试",
+										 	type:"error"
+								 		});
+				                    }
+				                },
+				            });
+	        			}
+	        			
+	        		},
+
+	        		clickPageLeft:function(){
+						if(this.presentPage>1){
+							this.presentPage--;
+						}
+						$('.search-value-list > [date-page!='+this.presentPage+']').hide();
+						$('.search-value-list > [date-page='+this.presentPage+']').show();
+	        		},
+
+	        		clickPageRight:function(){
+						if(this.presentPage<Math.ceil(this.AmountofItem/this.AmountifItemPrepage)){
+							this.presentPage++;
+						}
+						$('.search-value-list > [date-page!='+this.presentPage+']').hide();
+						$('.search-value-list > [date-page='+this.presentPage+']').show();
+	        		}
+
+	        	}
+			});
+
+			vm_hotspotlist.initial();
+
+	</script>
+
+	<script src="/static/js/jQuery.Hz2Py-min.js"></script>
+	<script src="/static/js/jsSearch.js"></script>
+
+	<script type="text/javascript">
+		//前端JS实现搜索
+		$(function(){
+			new SEARCH_ENGINE("search-test-inner","search-value","search-value-list","search-tit");
+		});
+	</script>
+	
+{% endblock %}
