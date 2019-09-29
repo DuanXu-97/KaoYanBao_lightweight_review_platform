@@ -2,7 +2,7 @@
 KaoYanBao is a lightweight review platform based on data mining for students who are going to take part in the postgraduate entrance examination.
 
 ## Modules
-KaoYanBao is mainly composed of three modules: 考研宝主要有以下三个版块：错题回顾、智能组题和资讯广场。
+KaoYanBao is mainly composed of three modules:
 > * Wrong Question Review
 * In this module, users can record the wrong questions online, so that users can review afterwards. This module supports rich texts to enter wrong questions and upload pictures. At the same time, it supports keyword searching and subject filtering for the wrong questions.
 > * Auto Paper Construct
