@@ -26,5 +26,4 @@ Please see the `doc` directory for more details.
 <img src="https://raw.githubusercontent.com/DuanXu-97/KaoYanBao/master/doc/%E9%94%99%E9%A2%98%E5%9B%9E%E9%A1%BE.png" alt="Wrong Question Review" width="600" height="280"/>
 <img src="https://raw.githubusercontent.com/DuanXu-97/KaoYanBao/master/doc/%E6%99%BA%E8%83%BD%E7%BB%84%E9%A2%98.png" alt="Auto Paper Construct" width="600" height="280"/>
 <img src="https://raw.githubusercontent.com/DuanXu-97/KaoYanBao/master/doc/%E8%B5%84%E8%AE%AF%E5%B9%BF%E5%9C%BA.png" alt="Information Square" width="600" height="280"/>
-<img src="https://raw.githubusercontent.com/DuanXu-97/KaoYanBao/master/doc/%E4%B8%AA%E4%BA%BA%E4%B8%AD%E5%BF%83.png" alt="User Center" width="600" height="280"/>
 </div>
