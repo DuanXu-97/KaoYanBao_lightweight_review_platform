@@ -18,7 +18,7 @@ In this module, user characteristics would be extracted according to the wrong q
 In this module, the platform will automatically crawl the information about the postgraduate related information and push it to the user.
 
 ## More Details
-Please see the `doc` directory for more details.
+Please see https://pan.baidu.com/s/1uyJh5Vp8k_IGxDABBRAgzg for more details, where the code is `wtfp`.
 
 ## UI Demo
 <div align=center>
