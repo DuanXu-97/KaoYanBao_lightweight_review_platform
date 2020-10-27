@@ -8,7 +8,7 @@ captcha==0.2.4
 celery==3.1.25
 cffi==1.11.5
 constantly==15.1.0
-cryptography==2.1.4
+cryptography==3.2
 cssselect==1.0.3
 Django==1.11.7
 django-celery==3.2.2
